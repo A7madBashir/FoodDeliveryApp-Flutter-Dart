@@ -54,19 +54,21 @@ class _LocationMapState extends State<LocationMap> {
       });
 
       // Handle socket events
-      socket.on('connect', (_) {});
+      // socket.on('connect', (_) {});
       socket.on('get-location', (data) async {
         print("Getting Delivery Location :$data");
-        setState(() {
-          deliveryLati = data["latitude"];
-          deliveryLong = data["longitude"];
-          print("Delivery Location Position $deliveryLati,$deliveryLong");
-        });
+        if (mounted) {
+          setState(() {
+            if (data != null) {
+              deliveryLati = data["latitude"];
+              deliveryLong = data["longitude"];
+              print("Delivery Location Position $deliveryLati,$deliveryLong");
+            }
+          });
+        } else {
+          return;
+        }
       });
-      // socket.on('get-delivery', online);
-      // socket.on('order-room', join);
-      //socket.emit('message', handleMessage);
-      // socket.on('receive', getmessage);
       socket.on('disconnect', (_) => disconnect);
       // print("Disconnecting");
     } catch (e) {
@@ -145,7 +147,7 @@ class _LocationMapState extends State<LocationMap> {
     );
     Widget yesButton = FlatButton(
       child: Text("Yes"),
-      onPressed: () {
+      onPressed: () async {
         setState(() {
           try {
             leave(widget.order_id);
@@ -164,7 +166,15 @@ class _LocationMapState extends State<LocationMap> {
         // Navigator.pushReplacement(
         //     context, MaterialPageRoute(builder: (context) => HomePage()));
         Navigator.pop(context);
-        closeScreen();
+        await Navigator.pushReplacement(
+            context,
+            new MaterialPageRoute(
+                builder: (context) => HomePage(
+                      meal: null,
+                      order: null,
+                      resturant: null,
+                      sIndex: 0,
+                    )));
       },
     );
 
@@ -187,18 +197,11 @@ class _LocationMapState extends State<LocationMap> {
     );
   }
 
-  void closeScreen() {
-    Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => HomePage()));
-  }
-
   Widget googleMapUI() {
     //Send All need Data To Server
 
     return Consumer<LocationProvider>(builder: (consumerContext, model, child) {
       if (model.locationPosition != null) {
-        print(
-            "Latitude : ${model.locationPosition.latitude},Longitude : ${model.locationPosition.longitude}");
         sendResturant();
         sendLocation(model.locationPosition.latitude,
             model.locationPosition.longitude, order_id, "Customer");

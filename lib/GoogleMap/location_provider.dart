@@ -6,6 +6,7 @@ import 'package:socket_io_client/socket_io_client.dart';
 
 class LocationProvider with ChangeNotifier {
   BitmapDescriptor _pinLocationIcon;
+  BitmapDescriptor _deliverylocation;
   Map<MarkerId, Marker> _markers;
   Map<MarkerId, Marker> get markers => _markers;
   final MarkerId markerId = MarkerId("1");
@@ -16,7 +17,7 @@ class LocationProvider with ChangeNotifier {
   Location _location;
   Location get location => _location;
   BitmapDescriptor get pinLocationIcon => _pinLocationIcon;
-
+  BitmapDescriptor get deliverylocation => _deliverylocation;
   LatLng _locationPosition;
   LatLng get locationPosition => _locationPosition;
 
@@ -109,16 +110,23 @@ class LocationProvider with ChangeNotifier {
       width: 4,
       color: Colors.redAccent,
       // startCap: Cap.roundCap,
-      // endCap: Cap.buttCap)
+      // endCap: Cap.customCapFromBitmap(deliverylocation),
     ));
+    Marker marker2 = Marker(
+        markerId: MarkerId("2"),
+        position: LatLng(recivelatitude, recivelongitude),
+        icon: deliverylocation);
+    _markers[MarkerId("2")] = marker2;
     return polyline;
   }
 
   setCustomMapPin() async {
     _pinLocationIcon = await BitmapDescriptor.fromAssetImage(
       ImageConfiguration(devicePixelRatio: 2.5),
-      'assets/destination_map_marker.png',
+      'assets/location.png',
     );
+    _deliverylocation = await BitmapDescriptor.fromAssetImage(
+        ImageConfiguration(devicePixelRatio: 2.5), 'assets/delivery.png');
   }
 
   takeSnapshot() {
