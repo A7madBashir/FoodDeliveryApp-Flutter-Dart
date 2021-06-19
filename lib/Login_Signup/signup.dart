@@ -52,6 +52,9 @@ class _SignUpPageState extends State<SignUpPage> {
       // To get json specific value with out this code i can't get by value by name
       Map<String, dynamic> body = json.decode(res.body);
       _setdata.setString("token", body["token"]);
+      _setdata.setString("phone", body["user"]["phone"]);
+      _setdata.setString("email", body["user"]["email"]);
+      _setdata.setString("username", body["user"]["username"]);
       _setdata.setInt("Customer_id", body["user"]["cus_id"]);
       //print(body["token"]);
       return body["success"];

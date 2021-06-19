@@ -46,11 +46,14 @@ class _LoginPageState extends State<LoginPage> {
       print("it's run correctly");
       final responestring = customerFromJson(res.body);
       // // To get json specific value with out this code i can't get by value by name
-      Map<String, dynamic> body = json.decode(res.body);
+      var body = json.decode(res.body);
       _setdata.setString("token", body["token"]);
+      _setdata.setString("phone", body["user"]["phone"]);
+      _setdata.setString("email", body["user"]["email"]);
+      _setdata.setString("username", body["user"]["username"]);
       _setdata.setInt("Customer_id", body["user"]["cus_id"]);
-      print(body["token"]);
-      print(body["user"]["cus_id"]);
+      // print(body["token"]);
+      // print(body["user"]["cus_id"]);
       return true;
     } else {
       //Should here make some dialog for customer to know what is wrong and till him to resign
