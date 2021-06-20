@@ -246,8 +246,10 @@ class _MealState extends State<Meal> {
                                 color: Colors.deepOrange,
                                 onPressed: () {
                                   setState(() {
-                                    _count++;
-                                    count = _count;
+                                    if (_count <= snapshot.data[0]['m_count']) {
+                                      _count++;
+                                      count = _count;
+                                    }
                                   });
                                 },
                               ),

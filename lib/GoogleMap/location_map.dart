@@ -42,6 +42,7 @@ class _LocationMapState extends State<LocationMap> {
   int order_id;
   double deliveryLati = 0;
   double deliveryLong = 0;
+  bool haveDelivery = false;
 //Socket Section
   Socket socket;
 
@@ -58,6 +59,7 @@ class _LocationMapState extends State<LocationMap> {
       socket.on('get-location', (data) async {
         print("Getting Delivery Location :$data");
         if (mounted) {
+          haveDelivery = true;
           setState(() {
             if (data != null) {
               deliveryLati = data["latitude"];
@@ -89,7 +91,7 @@ class _LocationMapState extends State<LocationMap> {
   online() {
     //till the delivery that there is an order waiting you!!!
     //it's should send room id
-    if (widget.order_id != null) {
+    if (widget.order_id != null && haveDelivery == false) {
       print("Getting The Delivery...");
       socket.emit('get-delivery', widget.order_id);
     }
@@ -162,6 +164,7 @@ class _LocationMapState extends State<LocationMap> {
           widget.order_id = null;
           widget.rest = null;
           resturant_id = null;
+          haveDelivery = false;
         });
         // Navigator.pushReplacement(
         //     context, MaterialPageRoute(builder: (context) => HomePage()));
@@ -169,7 +172,7 @@ class _LocationMapState extends State<LocationMap> {
         await Navigator.pushReplacement(
             context,
             new MaterialPageRoute(
-                builder: (context) => HomePage(
+                builder: (_) => HomePage(
                       meal: null,
                       order: null,
                       resturant: null,
@@ -203,6 +206,7 @@ class _LocationMapState extends State<LocationMap> {
     return Consumer<LocationProvider>(builder: (consumerContext, model, child) {
       if (model.locationPosition != null) {
         sendResturant();
+        online();
         sendLocation(model.locationPosition.latitude,
             model.locationPosition.longitude, order_id, "Customer");
         return Column(
@@ -211,7 +215,9 @@ class _LocationMapState extends State<LocationMap> {
             Expanded(
               child: GoogleMap(
                 mapType: MapType.normal,
-                polylines: model.polyLine(deliveryLati, deliveryLong),
+                polylines: haveDelivery == true
+                    ? model.polyLine(deliveryLati, deliveryLong)
+                    : null,
                 initialCameraPosition: CameraPosition(
                   target: model.locationPosition,
                   zoom: 18,
